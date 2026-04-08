@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
 
     const safeFileName = `${reportName.replace(/[^a-zA-Z0-9_\-. ]/g, "_")}.xlsx`;
 
-    return new NextResponse(excelBuffer, {
+    return new NextResponse(new Uint8Array(excelBuffer), {
       headers: {
         "Content-Type":
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
