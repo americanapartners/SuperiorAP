@@ -164,14 +164,13 @@ export function DataPreview({ transactions, onExport, onEmail, isExporting }: Da
                     </td>
                     <td className="px-2 py-1.5 border-r border-gray-200 text-right"></td>
                     <td className="px-2 py-1.5 border-r border-gray-200 text-right text-gray-400">&mdash;</td>
-                    <td className="px-2 py-1.5 border-r border-gray-200 text-right text-gray-400 italic">
-                      {isTotalRow ? "=OpenBal\u2212BankBal" : ""}
+                    <td className="px-2 py-1.5 border-r border-gray-200 text-right">
+                      {isTotalRow ? fmtCurrency(0) : ""}
                     </td>
-                    <td className="px-2 py-1.5 border-r border-gray-200 text-right text-gray-400 italic">
-                      {isTotalRow ? "=OutChks\u2212Amount" : ""}
+                    <td className={"px-2 py-1.5 border-r border-gray-200 text-right" + (isTotalRow ? " font-semibold" : "")}>
+                      {isTotalRow ? fmtCurrency(-(typeof tx.amount === "number" ? tx.amount : parseFloat(String(tx.amount)) || 0)) : ""}
                     </td>
-                    <td className="px-2 py-1.5 border-r border-gray-200 text-right text-gray-400">
-                      {isTotalRow ? "\u2014" : ""}
+                    <td className="px-2 py-1.5 border-r border-gray-200 text-right">
                     </td>
                     <td className="px-2 py-1.5 last:border-r-0">{tx.note}</td>
                   </tr>
@@ -182,7 +181,7 @@ export function DataPreview({ transactions, onExport, onEmail, isExporting }: Da
               <tr style={{ backgroundColor: "#f4f1eb" }}>
                 {HEADERS.map((_, ci) => {
                   if (ci === 10) return <td key={ci} className="px-2 py-2 border-r border-gray-300 font-bold text-right whitespace-nowrap">TOTAL</td>;
-                  if (ci === 11) return <td key={ci} className="px-2 py-2 border-r border-gray-300 font-bold text-right whitespace-nowrap text-gray-500 italic">=SUMIF(Total rows, L)</td>;
+                  if (ci === 11) return <td key={ci} className="px-2 py-2 border-r border-gray-300 font-bold text-right whitespace-nowrap">{fmtCurrency(-totalAmount)}</td>;
                   return <td key={ci} className="px-2 py-2 border-r border-gray-300 last:border-r-0" />;
                 })}
               </tr>
