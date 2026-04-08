@@ -49,11 +49,6 @@ export function FileUpload() {
       return;
     }
 
-    if (!email) {
-      toast.error("Please enter an email address");
-      return;
-    }
-
     setIsProcessing(true);
 
     try {
@@ -259,7 +254,6 @@ export function FileUpload() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="your.email@example.com"
-              required
               disabled={isProcessing}
             />
           </div>

@@ -3,29 +3,44 @@ import path from "path";
 import { DEFAULT_CLIENTS } from "./constants/clients";
 import type { Client } from "./types";
 
-const DATA_FILE = path.join(process.cwd(), "data", "clients.json");
+// Use /tmp on read-only filesystems (e.g. Vercel), otherwise use project data dir
+const DATA_DIR = process.env.VERCEL
+  ? path.join("/tmp", "nrt-data")
+  : path.join(process.cwd(), "data");
+const DATA_FILE = path.join(DATA_DIR, "clients.json");
+
+const DEFAULT_SEED = (): Client[] =>
+  DEFAULT_CLIENTS.map((name, i) => ({
+    id: crypto.randomUUID(),
+    name,
+    display_order: i + 1,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  }));
 
 async function ensureDataFile(): Promise<Client[]> {
   try {
     const raw = await fs.readFile(DATA_FILE, "utf-8");
     return JSON.parse(raw) as Client[];
   } catch {
-    const seeded: Client[] = DEFAULT_CLIENTS.map((name, i) => ({
-      id: crypto.randomUUID(),
-      name,
-      display_order: i + 1,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    }));
-    await fs.mkdir(path.dirname(DATA_FILE), { recursive: true });
-    await fs.writeFile(DATA_FILE, JSON.stringify(seeded, null, 2));
+    const seeded = DEFAULT_SEED();
+    try {
+      await fs.mkdir(DATA_DIR, { recursive: true });
+      await fs.writeFile(DATA_FILE, JSON.stringify(seeded, null, 2));
+    } catch {
+      // Read-only filesystem — return in-memory defaults without persisting
+    }
     return seeded;
   }
 }
 
 async function writeClients(clients: Client[]): Promise<void> {
-  await fs.mkdir(path.dirname(DATA_FILE), { recursive: true });
-  await fs.writeFile(DATA_FILE, JSON.stringify(clients, null, 2));
+  try {
+    await fs.mkdir(DATA_DIR, { recursive: true });
+    await fs.writeFile(DATA_FILE, JSON.stringify(clients, null, 2));
+  } catch {
+    // Read-only filesystem — changes are not persisted
+  }
 }
 
 export const localStore = {
