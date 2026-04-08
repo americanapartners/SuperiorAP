@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,8 +20,22 @@ export function FileUpload() {
   const [reportName, setReportName] = useState(`Master AP Aging Detail ${new Date().toISOString().split('T')[0]}`);
   const [email, setEmail] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
-  const [processedData, setProcessedData] = useState<TransactionRow[] | null>(null);
+  const [processedData, setProcessedData] = useState<TransactionRow[] | null>(() => {
+    if (typeof window === "undefined") return null;
+    try {
+      const saved = sessionStorage.getItem("nrt-processed-data");
+      return saved ? JSON.parse(saved) : null;
+    } catch { return null; }
+  });
   const [isExporting, setIsExporting] = useState(false);
+
+  useEffect(() => {
+    if (processedData) {
+      sessionStorage.setItem("nrt-processed-data", JSON.stringify(processedData));
+    } else {
+      sessionStorage.removeItem("nrt-processed-data");
+    }
+  }, [processedData]);
 
   const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = e.target.files;
@@ -148,6 +162,7 @@ export function FileUpload() {
     setProcessedData(null);
     setFiles([]);
     setReportName(`Master AP Aging Detail ${new Date().toISOString().split('T')[0]}`);
+    sessionStorage.removeItem("nrt-processed-data");
   };
 
   if (processedData) {
