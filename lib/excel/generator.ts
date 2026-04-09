@@ -11,12 +11,11 @@ const COLS = [
   { header: "Due Date",                  width: 12.63 },
   { header: "Past Due",                  width: 8.88  },
   { header: "Amount",                    width: 13.88 },
-  { header: "Open Balance",              width: 13.88 },
-  { header: "Bank Balance",              width: 13.88 },
-  { header: "Outstanding Checks",        width: 16.38 },
-  { header: "Current Available Balance", width: 20.13 },
-  { header: "Balance after paid",        width: 23.88 },
-  { header: "Note",                      width: 12.63 },
+  { header: "Bank Balance",              width: 13.88 },  // I — user enters after export
+  { header: "Outstanding Checks",        width: 16.38 },  // J — user enters after export
+  { header: "Current Available Balance", width: 20.13 },  // K — formula: =I-J
+  { header: "Balance after paid",        width: 23.88 },  // L — formula: =K-H
+  { header: "Note",                      width: 12.63 },  // M
 ] as const;
 
 const CURRENCY = "$#,##0.00";
@@ -57,6 +56,7 @@ export async function generateMasterReport(
 
   // ── Data rows start at Excel row 5 ────────────────────────────────────────
   let r = 5;
+  let grandTotal = 0;
 
   for (const tx of transactions) {
     const row = ws.getRow(r);
@@ -66,18 +66,21 @@ export async function generateMasterReport(
       row.getCell(1).value = tx.company;
 
       const amt = typeof tx.amount === "number" ? tx.amount : Number(tx.amount) || 0;
+      grandTotal += amt;
       const amtCell = row.getCell(8);
       amtCell.value  = amt;
       amtCell.numFmt = CURRENCY;
 
-      // K = Outstanding Checks = Open Balance (I) − Bank Balance (J)
+      // K (col 11) = Current Available Balance = Bank Balance (I) − Outstanding Checks (J)
+      // result: 0 because I and J are blank until user fills them in
       const kCell = row.getCell(11);
-      kCell.value  = { formula: `I${r}-J${r}` };
+      kCell.value  = { formula: `I${r}-J${r}`, result: 0 };
       kCell.numFmt = CURRENCY;
 
-      // L = Current Available Balance = Outstanding Checks (K) − Amount (H)
+      // L (col 12) = Balance after paid = Current Available Balance (K) − Amount (H)
+      // result: 0 − amt = −amt (K is 0 until Bank Balance / Outstanding Checks are entered)
       const lCell = row.getCell(12);
-      lCell.value  = { formula: `K${r}-H${r}` };
+      lCell.value  = { formula: `K${r}-H${r}`, result: -amt };
       lCell.numFmt = CURRENCY;
 
       // Style every cell in the total row
@@ -96,13 +99,12 @@ export async function generateMasterReport(
         row.getCell(5).value  = tx.vendor           || null;
         row.getCell(6).value  = tx.dueDate          || null;
         row.getCell(7).value  = tx.pastDue          || null;
-        row.getCell(14).value = tx.note             || null;
+        row.getCell(13).value = tx.note             || null;  // Note now at M (col 13)
 
         if (tx.amount !== "" && tx.amount !== null && tx.amount !== undefined) {
           const v = typeof tx.amount === "number" ? tx.amount : Number(tx.amount);
           if (Number.isFinite(v)) { row.getCell(8).value = v; row.getCell(8).numFmt = CURRENCY; }
         }
-        // Open Balance (col I) is intentionally left blank — not written to the sheet
       }
     }
 
@@ -115,7 +117,7 @@ export async function generateMasterReport(
   totalLabelCell.font  = { bold: true };
 
   const totalFormulaCell = ws.getRow(r).getCell(12);
-  totalFormulaCell.value  = { formula: `SUMIF(A:A,"*Total*",L:L)` };
+  totalFormulaCell.value  = { formula: `SUMIF(A:A,"*Total*",L:L)`, result: -grandTotal };
   totalFormulaCell.numFmt = CURRENCY;
   totalFormulaCell.font   = { bold: true };
 

@@ -17,7 +17,7 @@ interface DataPreviewProps {
 
 const HEADERS = [
   "Company","Date","Transaction Type","Num","Vendor","Due Date",
-  "Past Due","Amount","Open Balance","Bank Balance","Outstanding Checks",
+  "Past Due","Amount","Bank Balance","Outstanding Checks",
   "Current Available Balance","Balance after paid","Note",
 ];
 
@@ -162,15 +162,13 @@ export function DataPreview({ transactions, onExport, onEmail, isExporting }: Da
                     <td className={"px-2 py-1.5 border-r border-gray-200 text-right" + (isTotalRow ? " font-semibold" : "")}>
                       {fmtCurrency(tx.amount)}
                     </td>
-                    <td className="px-2 py-1.5 border-r border-gray-200 text-right"></td>
+                    <td className="px-2 py-1.5 border-r border-gray-200 text-right text-gray-400">&mdash;</td>
                     <td className="px-2 py-1.5 border-r border-gray-200 text-right text-gray-400">&mdash;</td>
                     <td className="px-2 py-1.5 border-r border-gray-200 text-right">
                       {isTotalRow ? fmtCurrency(0) : ""}
                     </td>
                     <td className={"px-2 py-1.5 border-r border-gray-200 text-right" + (isTotalRow ? " font-semibold" : "")}>
                       {isTotalRow ? fmtCurrency(-(typeof tx.amount === "number" ? tx.amount : parseFloat(String(tx.amount)) || 0)) : ""}
-                    </td>
-                    <td className="px-2 py-1.5 border-r border-gray-200 text-right">
                     </td>
                     <td className="px-2 py-1.5 last:border-r-0">{tx.note}</td>
                   </tr>
@@ -191,7 +189,7 @@ export function DataPreview({ transactions, onExport, onEmail, isExporting }: Da
       </div>
 
       <p className="text-xs text-muted-foreground">
-        Formula columns (Outstanding Checks, Current Available Balance) calculate automatically in the exported file once Bank Balance is entered.
+        Formula columns (Current Available Balance, Balance after paid) calculate automatically in the exported file once Bank Balance and Outstanding Checks are entered.
       </p>
     </div>
   );
