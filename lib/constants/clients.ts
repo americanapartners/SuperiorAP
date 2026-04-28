@@ -27,7 +27,6 @@ export const DEFAULT_CLIENTS = [
   "Broyles",
   "Centerton",
   "Joyce",
-  "NWA Storage Old",
   "Oak St",
   "Pleasant St 1",
   "Pleasant St 2",
