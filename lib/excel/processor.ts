@@ -1,6 +1,34 @@
 import type { TransactionRow, ProcessedData } from "@/lib/types";
 
-const normKey = (v: string) => String(v || "").trim().toLowerCase();
+/**
+ * Normalise a company name for fuzzy matching between the master client list
+ * and names that come out of QuickBooks AP Aging exports, which can differ by:
+ *   - Case                  ("JMS Holly Springs" vs "JMS HOLLY SPRINGS LLC")
+ *   - Legal suffixes        ("... LLC", "... Inc")
+ *   - Street abbreviations  ("Oak St" vs "Oak Street")
+ *   - Missing street type   ("Broyles" vs "Broyles Street", "Airport" vs "Airport Blvd")
+ */
+function normKey(v: string): string {
+  let s = String(v || "").trim().toLowerCase();
+
+  // Strip trailing legal-entity suffixes
+  s = s.replace(/\s+(llc|inc|corp|ltd|llp)\.?\s*$/, "");
+
+  // Expand common street abbreviations so both sides use the same token
+  // \b...\b + optional period — won't match mid-word (e.g. "st" inside "pleasant")
+  s = s.replace(/\bst\.?\b/g,   "street");
+  s = s.replace(/\bblvd\.?\b/g, "boulevard");
+  s = s.replace(/\bave\.?\b/g,  "avenue");
+  s = s.replace(/\bdr\.?\b/g,   "drive");
+  s = s.replace(/\brd\.?\b/g,   "road");
+  s = s.replace(/\bln\.?\b/g,   "lane");
+
+  // Strip trailing street-type words so a name-only key ("Broyles", "Airport")
+  // matches the same company when QuickBooks appends the street type.
+  s = s.replace(/\s+(street|boulevard|avenue|drive|road|lane|way|court|circle|place)$/, "");
+
+  return s.replace(/\s+/g, " ").trim();
+}
 
 const toNum = (v: unknown): number | "" => {
   if (v === undefined || v === null || v === "") return "";
