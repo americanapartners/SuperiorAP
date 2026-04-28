@@ -28,10 +28,10 @@ export interface TransactionRow {
   company: string;
   date: string;
   transactionType: string;
-  num: string;
+  num: string | number;
   vendor: string;
   dueDate: string;
-  pastDue: string;
+  pastDue: string | number;
   amount: string | number;
   openBalance: string | number;
   bankBalance: string | number;

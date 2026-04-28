@@ -25,6 +25,25 @@ function normalizeMoney(v: unknown): string | number {
   return Number.isFinite(n) ? Number(n.toFixed(2)) : String(v);
 }
 
+// Converts to a real number when the value is purely numeric (e.g. check numbers
+// like "1001"), otherwise keeps as string. Prevents Excel "Number stored as text"
+// green-triangle warnings in column D.
+function normalizeNum(v: unknown): string | number {
+  if (isEmpty(v)) return "";
+  const s = String(v).trim();
+  if (s === "") return "";
+  const n = Number(s);
+  return Number.isFinite(n) ? n : s;
+}
+
+// Past Due is always a whole-number count of days. Returns a number so Excel
+// does not flag column G with "Number stored as text".
+function normalizePastDue(v: unknown): number | "" {
+  if (isEmpty(v)) return "";
+  const n = Number(v);
+  return Number.isFinite(n) ? Math.round(n) : "";
+}
+
 /**
  * QuickBooks AP Aging Detail XLS structure (individual company file):
  *
@@ -96,10 +115,10 @@ export function parseExcelFile(buffer: Buffer): TransactionRow[] {
       company:         companyName,
       date:            normalizeDate(dateVal),
       transactionType: String(row[dc + 1] ?? "").trim(),
-      num:             String(row[dc + 2] ?? "").trim(),
+      num:             normalizeNum(row[dc + 2]),
       vendor:          String(row[dc + 3] ?? "").trim(),
       dueDate:         normalizeDate(row[dc + 4]),
-      pastDue:         String(row[dc + 5] ?? "").trim(),
+      pastDue:         normalizePastDue(row[dc + 5]),
       amount:          normalizeMoney(amountV),
       openBalance:     normalizeMoney(openBalV),
       bankBalance:              "",

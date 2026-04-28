@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "NRT AP Aging Dashboard",
-  description: "AP Aging Detail Report Management System for NRT Consulting",
+  description: "AP Aging Detail Report Management System for Americana",
 };
 
 export default function RootLayout({

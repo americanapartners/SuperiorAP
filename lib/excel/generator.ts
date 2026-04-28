@@ -95,10 +95,10 @@ export async function generateMasterReport(
         row.getCell(1).value  = tx.company          || null;
         row.getCell(2).value  = tx.date             || null;
         row.getCell(3).value  = tx.transactionType  || null;
-        row.getCell(4).value  = tx.num              || null;
+        row.getCell(4).value  = (tx.num      !== "" && tx.num      != null) ? tx.num      : null;
         row.getCell(5).value  = tx.vendor           || null;
         row.getCell(6).value  = tx.dueDate          || null;
-        row.getCell(7).value  = tx.pastDue          || null;
+        row.getCell(7).value  = (tx.pastDue  !== "" && tx.pastDue  != null) ? tx.pastDue  : null;
         row.getCell(13).value = tx.note             || null;  // Note now at M (col 13)
 
         if (tx.amount !== "" && tx.amount !== null && tx.amount !== undefined) {
