@@ -72,18 +72,26 @@ export function parseExcelFile(buffer: Buffer): TransactionRow[] {
   const out: TransactionRow[] = [];
   let companyName = "";
   let dateColIdx = -1;
-  let seenFirstRow = false;
+  let companyNameFound = false;
+
+  // Matches report-title rows that QuickBooks sometimes puts before the company
+  // name: "A/P Aging Detail", "A/P Aging Detail - 12/02/2025", etc.
+  const isReportTitle = (v: string) => /^a\/p aging/i.test(v);
 
   for (const rawRow of allRows) {
     const row = rawRow as unknown[];
     const nonEmpty = row.filter((v) => !isEmpty(v));
     if (nonEmpty.length === 0) continue;
 
-    // ── Row 0: company name (always the very first non-empty row) ────────────
-    if (!seenFirstRow) {
-      seenFirstRow = true;
+    // ── Company name: first non-empty row whose col A is NOT a report title ──
+    if (!companyNameFound) {
       if (!isEmpty(row[0])) {
-        companyName = String(row[0]).trim();
+        const val = String(row[0]).trim();
+        if (!isReportTitle(val)) {
+          companyName = val;
+          companyNameFound = true;
+        }
+        // If it IS a report title, skip the row and keep looking
       }
       continue;
     }
