@@ -47,9 +47,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "email, password, and role are required" }, { status: 400 });
     }
 
+    if (password.length < 8) {
+      return NextResponse.json({ error: "Password must be at least 8 characters." }, { status: 400 });
+    }
+
     const domain = email.split("@")[1]?.toLowerCase();
     if (!["americanapartners.com", "nonzeroai.com"].includes(domain)) {
       return NextResponse.json({ error: "Domain not allowed" }, { status: 400 });
+    }
+
+    if (!["admin", "user"].includes(role)) {
+      return NextResponse.json({ error: "Invalid role." }, { status: 400 });
     }
 
     const adminClient = createSupabaseAdminClient();
@@ -62,7 +70,13 @@ export async function POST(request: NextRequest) {
     });
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 });
+      // Don't forward raw Supabase messages — they can leak whether an email is registered
+      const msg = error.message?.toLowerCase() ?? "";
+      const safeMessage =
+        msg.includes("already registered") || msg.includes("already exists")
+          ? "A user with that email already exists."
+          : "Failed to create user.";
+      return NextResponse.json({ error: safeMessage }, { status: 400 });
     }
 
     return NextResponse.json({ success: true, userId: data.user.id }, { status: 201 });
