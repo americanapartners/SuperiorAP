@@ -11,9 +11,15 @@ export interface Report {
   report_name: string;
   report_date: string;
   file_url: string | null;
-  status: 'processing' | 'completed' | 'failed';
+  status: string;  // 'processing' | 'completed' | 'failed' — kept as string to match DB
+  created_by: string | null;
   created_at: string;
   updated_at: string;
+}
+
+// Type guard used by components that need the status union
+export function isReportStatus(s: string): s is 'processing' | 'completed' | 'failed' {
+  return s === 'processing' || s === 'completed' || s === 'failed';
 }
 
 export interface ReportFile {
