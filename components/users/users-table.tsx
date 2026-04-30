@@ -10,7 +10,7 @@ import {
   Dialog, DialogContent, DialogDescription, DialogFooter,
   DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
-import { UserPlus, Loader2, ShieldCheck, User, Trash2 } from "lucide-react";
+import { UserPlus, Loader2, ShieldCheck, User, Trash2, Pencil } from "lucide-react";
 import { toast } from "sonner";
 
 const ALLOWED_DOMAINS = ["americanapartners.com", "nonzeroai.com"];
@@ -27,6 +27,13 @@ interface UserRow {
 interface AddForm {
   email: string;
   full_name: string;
+  password: string;
+  role: "admin" | "user";
+}
+
+interface EditForm {
+  full_name: string;
+  email: string;
   password: string;
   role: "admin" | "user";
 }
@@ -54,7 +61,23 @@ export function UsersTable() {
   const [removeTarget, setRemoveTarget] = useState<UserRow | null>(null);
   const [isRemoving, setIsRemoving] = useState(false);
 
+  // Edit user dialog state
+  const [editTarget, setEditTarget] = useState<UserRow | null>(null);
+  const [editForm, setEditForm] = useState<EditForm>({ full_name: "", email: "", password: "", role: "user" });
+  const [editError, setEditError] = useState<string | null>(null);
+  const [editEmailDomainError, setEditEmailDomainError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
   useEffect(() => { fetchUsers(); }, []);
+
+  // Fetch the logged-in admin's own ID once on mount (used to disable role picker for self)
+  useEffect(() => {
+    fetch("/api/users/me")
+      .then((r) => r.json())
+      .then((d) => setCurrentUserId(d.id ?? null))
+      .catch(() => {});
+  }, []);
 
   const fetchUsers = async () => {
     try {
@@ -118,19 +141,44 @@ export function UsersTable() {
     }
   };
 
-  const toggleRole = async (user: UserRow) => {
-    const newRole = user.role === "admin" ? "user" : "admin";
+  const handleEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editTarget) return;
+
+    const domErr = domainError(editForm.email);
+    if (domErr) { setEditEmailDomainError(domErr); return; }
+    if (editForm.password && editForm.password.length < 8) {
+      setEditError("Password must be at least 8 characters.");
+      return;
+    }
+
+    // Build diff — only include fields that actually changed
+    const diff: Record<string, string> = {};
+    if (editForm.full_name !== (editTarget.full_name ?? "")) diff.full_name = editForm.full_name;
+    if (editForm.email !== editTarget.email) diff.email = editForm.email;
+    if (editForm.password) diff.password = editForm.password;
+    if (editForm.role !== editTarget.role) diff.role = editForm.role;
+
+    // Nothing changed — close silently
+    if (Object.keys(diff).length === 0) { setEditTarget(null); return; }
+
+    setIsSaving(true);
+    setEditError(null);
     try {
-      const res = await fetch(`/api/users/${user.id}`, {
+      const res = await fetch(`/api/users/${editTarget.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role: newRole }),
+        body: JSON.stringify(diff),
       });
-      if (!res.ok) throw new Error();
-      toast.success(`${user.email} is now ${newRole}`);
-      setUsers((prev) => prev.map((u) => u.id === user.id ? { ...u, role: newRole } : u));
-    } catch {
-      toast.error("Failed to update role");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Failed to update user");
+      toast.success("User updated");
+      setEditTarget(null);
+      fetchUsers();
+    } catch (err) {
+      setEditError(err instanceof Error ? err.message : "Failed to update user");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -191,8 +239,22 @@ export function UsersTable() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="sm" onClick={() => toggleRole(user)}>
-                        {user.role === "admin" ? "Make User" : "Make Admin"}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setEditError(null);
+                          setEditEmailDomainError(null);
+                          setEditTarget(user);
+                          setEditForm({
+                            full_name: user.full_name ?? "",
+                            email: user.email,
+                            password: "",
+                            role: user.role,
+                          });
+                        }}
+                      >
+                        <Pencil className="h-4 w-4" />
                       </Button>
                       <Button
                         variant="ghost"
@@ -326,6 +388,105 @@ export function UsersTable() {
               Remove User
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Edit User Dialog ── */}
+      <Dialog open={!!editTarget} onOpenChange={(open) => {
+        if (!open) {
+          setEditTarget(null);
+          setEditError(null);
+          setEditEmailDomainError(null);
+          setEditForm({ full_name: "", email: "", password: "", role: "user" });
+        }
+      }}>
+        <DialogContent>
+          <form onSubmit={handleEdit}>
+            <DialogHeader>
+              <DialogTitle>Edit User</DialogTitle>
+              <DialogDescription>
+                Update {editTarget?.email}&apos;s account details.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4 space-y-4">
+              {editError && (
+                <p className="text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md px-3 py-2">
+                  {editError}
+                </p>
+              )}
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-name">
+                  Full Name <span className="text-muted-foreground font-normal">(optional)</span>
+                </Label>
+                <Input
+                  id="edit-name"
+                  type="text"
+                  value={editForm.full_name}
+                  onChange={(e) => setEditForm((f) => ({ ...f, full_name: e.target.value }))}
+                  placeholder="e.g. Morgan Lee"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-email">Email</Label>
+                <Input
+                  id="edit-email"
+                  type="email"
+                  value={editForm.email}
+                  onChange={(e) => {
+                    setEditForm((f) => ({ ...f, email: e.target.value }));
+                    setEditEmailDomainError(null);
+                  }}
+                  onBlur={() => setEditEmailDomainError(domainError(editForm.email))}
+                  required
+                />
+                {editEmailDomainError && <p className="text-xs text-destructive">{editEmailDomainError}</p>}
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-password">Password</Label>
+                <Input
+                  id="edit-password"
+                  type="password"
+                  value={editForm.password}
+                  onChange={(e) => setEditForm((f) => ({ ...f, password: e.target.value }))}
+                  placeholder="Leave blank to keep current password"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Role</Label>
+                <div className={`grid grid-cols-2 gap-2 ${editTarget?.id === currentUserId ? "opacity-50 pointer-events-none" : ""}`}>
+                  {(["user", "admin"] as const).map((r) => (
+                    <button
+                      key={r}
+                      type="button"
+                      onClick={() => setEditForm((f) => ({ ...f, role: r }))}
+                      className={`rounded-md border p-3 text-left transition-colors ${
+                        editForm.role === r
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-input hover:border-muted-foreground"
+                      }`}
+                    >
+                      <p className="text-sm font-semibold capitalize">{r}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {r === "user" ? "Upload & view reports" : "Full access + settings"}
+                      </p>
+                    </button>
+                  ))}
+                </div>
+                {editTarget?.id === currentUserId && (
+                  <p className="text-xs text-muted-foreground">You cannot change your own role.</p>
+                )}
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setEditTarget(null)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isSaving}>
+                {isSaving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                Save Changes
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
     </>
