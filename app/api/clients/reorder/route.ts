@@ -14,18 +14,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "orderedIds array required" }, { status: 400 });
     }
 
-    const updates = orderedIds.map((id, index) => ({
-      id,
-      display_order: index + 1,
-    }));
-
-    // Partial upsert — only updating display_order; name is preserved by ON CONFLICT DO UPDATE
-    // Cast required because generated types enforce all non-nullable columns on insert path
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await supabase
-      .from("clients")
-      .upsert(updates as any, { onConflict: "id" });
-    if (error) throw error;
+    const results = await Promise.all(
+      orderedIds.map((id, index) =>
+        supabase.from("clients").update({ display_order: index + 1 }).eq("id", id)
+      )
+    );
+    const failed = results.find((r) => r.error);
+    if (failed?.error) throw failed.error;
 
     return NextResponse.json({ success: true });
   } catch (error) {
