@@ -132,9 +132,9 @@ export function DataPreview({ transactions, onExport, isExporting }: DataPreview
                 const blank = isBlankRow(tx);
                 if (blank) {
                   return (
-                    <tr key={i} className="h-4 border-b border-gray-100">
+                    <tr key={i} className="h-4 border-b border-border/40">
                       {HEADERS.map((_, ci) => (
-                        <td key={ci} className="border-r border-gray-100 last:border-r-0" />
+                        <td key={ci} className="border-r border-border/40 last:border-r-0" />
                       ))}
                     </tr>
                   );
@@ -142,27 +142,26 @@ export function DataPreview({ transactions, onExport, isExporting }: DataPreview
                 return (
                   <tr
                     key={i}
-                    className={"border-b " + (isTotalRow ? "" : "hover:bg-gray-50")}
-                    style={isTotalRow ? { backgroundColor: "#f4f1eb" } : undefined}
+                    className={"border-b border-border " + (isTotalRow ? "bg-amber-50 dark:bg-amber-950/40" : "hover:bg-muted/40")}
                   >
-                    <td className={"px-2 py-1.5 border-r border-gray-200 whitespace-nowrap" + (isTotalRow ? " font-semibold" : "")}>
+                    <td className={"px-2 py-1.5 border-r border-border whitespace-nowrap" + (isTotalRow ? " font-semibold" : "")}>
                       {tx.company}
                     </td>
-                    <td className="px-2 py-1.5 border-r border-gray-200 whitespace-nowrap">{isTotalRow ? "" : tx.date}</td>
-                    <td className="px-2 py-1.5 border-r border-gray-200 whitespace-nowrap">{isTotalRow ? "" : tx.transactionType}</td>
-                    <td className="px-2 py-1.5 border-r border-gray-200 whitespace-nowrap">{isTotalRow ? "" : tx.num}</td>
-                    <td className="px-2 py-1.5 border-r border-gray-200">{isTotalRow ? "" : tx.vendor}</td>
-                    <td className="px-2 py-1.5 border-r border-gray-200 whitespace-nowrap">{isTotalRow ? "" : tx.dueDate}</td>
-                    <td className="px-2 py-1.5 border-r border-gray-200 text-right">{isTotalRow ? "" : tx.pastDue}</td>
-                    <td className={"px-2 py-1.5 border-r border-gray-200 text-right" + (isTotalRow ? " font-semibold" : "")}>
+                    <td className="px-2 py-1.5 border-r border-border whitespace-nowrap">{isTotalRow ? "" : tx.date}</td>
+                    <td className="px-2 py-1.5 border-r border-border whitespace-nowrap">{isTotalRow ? "" : tx.transactionType}</td>
+                    <td className="px-2 py-1.5 border-r border-border whitespace-nowrap">{isTotalRow ? "" : tx.num}</td>
+                    <td className="px-2 py-1.5 border-r border-border">{isTotalRow ? "" : tx.vendor}</td>
+                    <td className="px-2 py-1.5 border-r border-border whitespace-nowrap">{isTotalRow ? "" : tx.dueDate}</td>
+                    <td className="px-2 py-1.5 border-r border-border text-right">{isTotalRow ? "" : tx.pastDue}</td>
+                    <td className={"px-2 py-1.5 border-r border-border text-right" + (isTotalRow ? " font-semibold" : "")}>
                       {fmtCurrency(tx.amount)}
                     </td>
-                    <td className="px-2 py-1.5 border-r border-gray-200 text-right text-gray-400">&mdash;</td>
-                    <td className="px-2 py-1.5 border-r border-gray-200 text-right text-gray-400">&mdash;</td>
-                    <td className="px-2 py-1.5 border-r border-gray-200 text-right">
+                    <td className="px-2 py-1.5 border-r border-border text-right text-gray-400">&mdash;</td>
+                    <td className="px-2 py-1.5 border-r border-border text-right text-gray-400">&mdash;</td>
+                    <td className="px-2 py-1.5 border-r border-border text-right">
                       {isTotalRow ? fmtCurrency(0) : ""}
                     </td>
-                    <td className={"px-2 py-1.5 border-r border-gray-200 text-right" + (isTotalRow ? " font-semibold" : "")}>
+                    <td className={"px-2 py-1.5 border-r border-border text-right" + (isTotalRow ? " font-semibold" : "")}>
                       {isTotalRow ? fmtCurrency(-(typeof tx.amount === "number" ? tx.amount : parseFloat(String(tx.amount)) || 0)) : ""}
                     </td>
                     <td className="px-2 py-1.5 last:border-r-0">{tx.note}</td>
@@ -171,11 +170,11 @@ export function DataPreview({ transactions, onExport, isExporting }: DataPreview
               })}
             </tbody>
             <tfoot className="sticky bottom-0 z-10">
-              <tr style={{ backgroundColor: "#f4f1eb" }}>
+              <tr className="bg-amber-50 dark:bg-amber-950/40">
                 {HEADERS.map((_, ci) => {
-                  if (ci === 10) return <td key={ci} className="px-2 py-2 border-r border-gray-300 font-bold text-right whitespace-nowrap">TOTAL</td>;
-                  if (ci === 11) return <td key={ci} className="px-2 py-2 border-r border-gray-300 font-bold text-right whitespace-nowrap">{fmtCurrency(-totalAmount)}</td>;
-                  return <td key={ci} className="px-2 py-2 border-r border-gray-300 last:border-r-0" />;
+                  if (ci === 10) return <td key={ci} className="px-2 py-2 border-r border-border font-bold text-right whitespace-nowrap">TOTAL</td>;
+                  if (ci === 11) return <td key={ci} className="px-2 py-2 border-r border-border font-bold text-right whitespace-nowrap">{fmtCurrency(-totalAmount)}</td>;
+                  return <td key={ci} className="px-2 py-2 border-r border-border last:border-r-0" />;
                 })}
               </tr>
             </tfoot>
