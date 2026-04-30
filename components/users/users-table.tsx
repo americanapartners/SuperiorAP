@@ -154,7 +154,7 @@ export function UsersTable() {
 
     // Build diff — only include fields that actually changed
     const diff: Record<string, string> = {};
-    if (editForm.full_name !== (editTarget.full_name ?? "")) diff.full_name = editForm.full_name;
+    if (editForm.full_name.trim() !== (editTarget.full_name ?? "")) diff.full_name = editForm.full_name.trim();
     if (editForm.email !== editTarget.email) diff.email = editForm.email;
     if (editForm.password) diff.password = editForm.password;
     if (editForm.role !== editTarget.role) diff.role = editForm.role;

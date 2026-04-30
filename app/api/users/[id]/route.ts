@@ -32,6 +32,10 @@ export async function PATCH(
       return NextResponse.json({ error: "Invalid role." }, { status: 400 });
     }
 
+    // Field updates are sequential with no transaction. If a field's second write
+    // (e.g. user_metadata sync after profiles update) fails, the outer catch returns
+    // 500 but the first write has already been committed. This is an accepted
+    // eventual-consistency trade-off for a low-traffic admin tool.
     const adminClient = createSupabaseAdminClient();
 
     // full_name — write to profiles, then sync to user_metadata
