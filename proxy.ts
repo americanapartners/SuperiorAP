@@ -5,7 +5,7 @@ import { createServerClient } from '@supabase/ssr'
 // Routes that require admin role
 const ADMIN_ROUTES = ['/history', '/users']
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { supabaseResponse, user } = await updateSession(request)
   const pathname = request.nextUrl.pathname
 
