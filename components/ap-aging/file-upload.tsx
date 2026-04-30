@@ -103,6 +103,7 @@ export function FileUpload() {
         body: JSON.stringify({
           transactions: processedData,
           reportName,
+          sourceFiles: files.map(({ file }) => ({ name: file.name, size: file.size })),
         }),
       });
 
