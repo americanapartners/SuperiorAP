@@ -87,6 +87,36 @@ export interface Database {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          id: string
+          full_name: string | null
+          role: "admin" | "user"
+          is_active: boolean
+          created_at: string
+          updated_at: string
+          invited_by: string | null
+        }
+        Insert: {
+          id: string
+          full_name?: string | null
+          role?: "admin" | "user"
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+          invited_by?: string | null
+        }
+        Update: {
+          id?: string
+          full_name?: string | null
+          role?: "admin" | "user"
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+          invited_by?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
