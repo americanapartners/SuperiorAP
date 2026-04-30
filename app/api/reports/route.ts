@@ -11,7 +11,7 @@ export async function GET() {
 
     const { data, error } = await supabase
       .from("reports")
-      .select("*, report_files(id, file_name, file_size)")
+      .select("*, report_files(id, file_name, file_size), profiles(full_name)")
       .order("created_at", { ascending: false });
 
     if (error) throw error;

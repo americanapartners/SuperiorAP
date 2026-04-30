@@ -39,7 +39,8 @@ export interface Database {
           report_name: string
           report_date: string
           file_url: string | null
-          status: 'processing' | 'completed' | 'failed'
+          status: string
+          created_by: string | null
           created_at: string
           updated_at: string
         }
@@ -48,7 +49,8 @@ export interface Database {
           report_name: string
           report_date: string
           file_url?: string | null
-          status?: 'processing' | 'completed' | 'failed'
+          status?: string
+          created_by?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -57,7 +59,8 @@ export interface Database {
           report_name?: string
           report_date?: string
           file_url?: string | null
-          status?: 'processing' | 'completed' | 'failed'
+          status?: string
+          created_by?: string | null
           created_at?: string
           updated_at?: string
         }

@@ -29,6 +29,7 @@ export async function POST(request: NextRequest) {
       report_name: reportName,
       report_date: new Date().toISOString().split("T")[0],
       status: "processing",
+      created_by: user.id,
     })
     .select()
     .single();
