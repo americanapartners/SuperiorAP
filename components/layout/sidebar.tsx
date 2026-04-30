@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { FileText, Users, History, LogOut, UserCog } from "lucide-react";
+import { FileText, Users, History, Settings, LogOut, Moon, Sun } from "lucide-react";
 import { signOut } from "@/app/actions/auth";
 import { useEffect, useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
@@ -15,12 +15,37 @@ const baseNavigation = [
 
 const adminNavigation = [
   { name: "History", href: "/history", icon: History },
-  { name: "Users", href: "/users", icon: UserCog },
+  { name: "Settings", href: "/users", icon: Settings },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
   const [userInfo, setUserInfo] = useState<{ name: string; email: string; role: string } | null>(null);
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    // Apply persisted theme on mount
+    const stored = localStorage.getItem("theme");
+    const dark = stored === "dark";
+    setIsDark(dark);
+    if (dark) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, []);
+
+  const toggleDark = () => {
+    const next = !isDark;
+    setIsDark(next);
+    if (next) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  };
 
   useEffect(() => {
     const supabase = createSupabaseBrowserClient();
@@ -63,7 +88,7 @@ export function Sidebar() {
           );
         })}
       </nav>
-      <div className="border-t p-4">
+      <div className="border-t p-4 space-y-1">
         <div className="mb-3 px-2">
           <p className="text-sm font-medium text-foreground truncate">{userInfo?.name ?? "Loading…"}</p>
           <p className="text-xs text-muted-foreground truncate">{userInfo?.email ?? ""}</p>
@@ -71,6 +96,14 @@ export function Sidebar() {
             <span className="text-xs text-amber-600 font-medium">Admin</span>
           )}
         </div>
+        <button
+          onClick={toggleDark}
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+          type="button"
+        >
+          {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          {isDark ? "Light mode" : "Dark mode"}
+        </button>
         <form action={signOut}>
           <button
             type="submit"
