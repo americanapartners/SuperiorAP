@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
-import { AuthSessionProvider } from "@/components/auth/session-provider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -15,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NRT AP Aging Dashboard",
+  title: "AP Aging Dashboard",
   description: "AP Aging Detail Report Management System for Americana",
 };
 
@@ -30,9 +29,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <AuthSessionProvider>
-          {children}
-        </AuthSessionProvider>
+        {children}
         <Toaster />
       </body>
     </html>

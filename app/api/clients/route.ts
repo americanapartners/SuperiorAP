@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isSupabaseConfigured, localStore } from "@/lib/local-store";
-import { supabaseServer } from "@/lib/supabase/server";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function GET() {
   try {
@@ -9,7 +9,8 @@ export async function GET() {
       return NextResponse.json(data);
     }
 
-    const { data, error } = await supabaseServer
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase
       .from("clients")
       .select("*")
       .order("display_order", { ascending: true });
@@ -43,7 +44,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(data, { status: 201 });
     }
 
-    const { data, error } = await supabaseServer
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase
       .from("clients")
       .insert([{ name, display_order }])
       .select()

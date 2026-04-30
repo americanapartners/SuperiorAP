@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { parseExcelFile } from "@/lib/excel/parser";
 import { calculateTotals } from "@/lib/excel/processor";
 import { isSupabaseConfigured, localStore } from "@/lib/local-store";
-import { supabaseServer } from "@/lib/supabase/server";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,7 +19,8 @@ export async function POST(request: NextRequest) {
       const clients = await localStore.getClients();
       masterCompanies = clients.map((c) => c.name);
     } else {
-      const { data, error } = await supabaseServer
+      const supabase = await createSupabaseServerClient();
+      const { data, error } = await supabase
         .from("clients")
         .select("name")
         .order("display_order", { ascending: true });

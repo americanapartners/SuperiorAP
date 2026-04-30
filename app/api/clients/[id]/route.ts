@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isSupabaseConfigured, localStore } from "@/lib/local-store";
-import { supabaseServer } from "@/lib/supabase/server";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function PUT(
   request: NextRequest,
@@ -19,7 +19,8 @@ export async function PUT(
       return NextResponse.json(data);
     }
 
-    const { data, error } = await supabaseServer
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase
       .from("clients")
       .update({ name, display_order })
       .eq("id", id)
@@ -53,7 +54,8 @@ export async function DELETE(
       return NextResponse.json({ success: true });
     }
 
-    const { error } = await supabaseServer
+    const supabase = await createSupabaseServerClient();
+    const { error } = await supabase
       .from("clients")
       .delete()
       .eq("id", id);
