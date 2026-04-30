@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     const { data, error } = await adminClient.auth.admin.inviteUserByEmail(email.trim());
     if (error) throw error;
 
-    await supabase.from("profiles").update({ invited_by: caller.id }).eq("id", data.user.id);
+    await adminClient.from("profiles").update({ invited_by: caller.id }).eq("id", data.user.id);
 
     return NextResponse.json({ success: true, userId: data.user.id }, { status: 201 });
   } catch (error) {
