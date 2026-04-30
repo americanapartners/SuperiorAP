@@ -21,7 +21,9 @@ const adminNavigation = [
 export function Sidebar() {
   const pathname = usePathname();
   const [userInfo, setUserInfo] = useState<{ name: string; email: string; role: string } | null>(null);
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(() =>
+    typeof window !== "undefined" && document.documentElement.classList.contains("dark")
+  );
 
   useEffect(() => {
     // Apply persisted theme on mount
