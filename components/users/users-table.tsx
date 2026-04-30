@@ -303,7 +303,7 @@ export function UsersTable() {
                   type="email"
                   value={addForm.email}
                   onChange={(e) => { setAddForm((f) => ({ ...f, email: e.target.value })); setEmailDomainError(null); }}
-                  onBlur={() => setEmailDomainError(domainError(addForm.email))}
+                  onBlur={(e) => setEmailDomainError(domainError(e.target.value))}
                   placeholder="name@americanapartners.com"
                   required
                 />
@@ -436,7 +436,7 @@ export function UsersTable() {
                     setEditForm((f) => ({ ...f, email: e.target.value }));
                     setEditEmailDomainError(null);
                   }}
-                  onBlur={() => setEditEmailDomainError(domainError(editForm.email))}
+                  onBlur={(e) => setEditEmailDomainError(domainError(e.target.value))}
                   required
                 />
                 {editEmailDomainError && <p className="text-xs text-destructive">{editEmailDomainError}</p>}
