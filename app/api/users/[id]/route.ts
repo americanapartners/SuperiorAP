@@ -43,3 +43,34 @@ export async function PATCH(
     return NextResponse.json({ error: "Failed to update user" }, { status: 500 });
   }
 }
+
+export async function DELETE(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { data: { user: caller } } = await supabase.auth.getUser();
+    if (!caller || caller.app_metadata?.role !== "admin") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const { id } = await params;
+
+    if (id === caller.id) {
+      return NextResponse.json(
+        { error: "You cannot remove your own account." },
+        { status: 400 }
+      );
+    }
+
+    const adminClient = createSupabaseAdminClient();
+    const { error } = await adminClient.auth.admin.deleteUser(id);
+    if (error) throw error;
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Error removing user:", error);
+    return NextResponse.json({ error: "Failed to remove user" }, { status: 500 });
+  }
+}

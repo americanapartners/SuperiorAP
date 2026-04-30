@@ -36,20 +36,38 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const { email } = await request.json() as { email: string };
-    if (!email?.trim()) {
-      return NextResponse.json({ error: "Email is required" }, { status: 400 });
+    const { email, password, full_name, role } = await request.json() as {
+      email: string;
+      password: string;
+      full_name?: string;
+      role: "admin" | "user";
+    };
+
+    if (!email?.trim() || !password || !role) {
+      return NextResponse.json({ error: "email, password, and role are required" }, { status: 400 });
+    }
+
+    const domain = email.split("@")[1]?.toLowerCase();
+    if (!["americanapartners.com", "nonzeroai.com"].includes(domain)) {
+      return NextResponse.json({ error: "Domain not allowed" }, { status: 400 });
     }
 
     const adminClient = createSupabaseAdminClient();
-    const { data, error } = await adminClient.auth.admin.inviteUserByEmail(email.trim());
-    if (error) throw error;
+    const { data, error } = await adminClient.auth.admin.createUser({
+      email: email.trim().toLowerCase(),
+      password,
+      email_confirm: true,
+      user_metadata: { full_name: full_name ?? "" },
+      app_metadata: { role },
+    });
 
-    await adminClient.from("profiles").update({ invited_by: caller.id }).eq("id", data.user.id);
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
 
     return NextResponse.json({ success: true, userId: data.user.id }, { status: 201 });
   } catch (error) {
-    console.error("Error inviting user:", error);
-    return NextResponse.json({ error: "Failed to invite user" }, { status: 500 });
+    console.error("Error creating user:", error);
+    return NextResponse.json({ error: "Failed to create user" }, { status: 500 });
   }
 }
