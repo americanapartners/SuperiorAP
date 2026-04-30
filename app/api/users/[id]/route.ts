@@ -36,20 +36,30 @@ export async function PATCH(
 
     // full_name — write to profiles, then sync to user_metadata
     if (body.full_name !== undefined) {
+      if (typeof body.full_name !== "string") {
+        return NextResponse.json({ error: "Invalid full_name." }, { status: 400 });
+      }
+      const trimmedName = body.full_name.trim();
+      if (trimmedName === "") {
+        return NextResponse.json({ error: "Full name cannot be empty." }, { status: 400 });
+      }
       const { error } = await supabase
         .from("profiles")
-        .update({ full_name: body.full_name })
+        .update({ full_name: trimmedName })
         .eq("id", id);
       if (error) throw error;
 
       const { error: authErr } = await adminClient.auth.admin.updateUserById(id, {
-        user_metadata: { full_name: body.full_name },
+        user_metadata: { full_name: trimmedName },
       });
       if (authErr) throw authErr;
     }
 
     // email — server-side domain validation, then update auth record
     if (body.email !== undefined) {
+      if (typeof body.email !== "string") {
+        return NextResponse.json({ error: "Invalid email." }, { status: 400 });
+      }
       const domain = body.email.split("@")[1]?.toLowerCase();
       if (!["americanapartners.com", "nonzeroai.com"].includes(domain ?? "")) {
         return NextResponse.json({ error: "Domain not allowed" }, { status: 400 });
@@ -62,6 +72,9 @@ export async function PATCH(
 
     // password — minimum 8 characters, then update auth record
     if (body.password !== undefined) {
+      if (typeof body.password !== "string") {
+        return NextResponse.json({ error: "Invalid password." }, { status: 400 });
+      }
       if (body.password.length < 8) {
         return NextResponse.json(
           { error: "Password must be at least 8 characters." },
