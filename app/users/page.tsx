@@ -6,10 +6,8 @@ export default function UsersPage() {
     <DashboardLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Users</h1>
-          <p className="text-muted-foreground mt-2">
-            Invite users, manage roles, and deactivate accounts
-          </p>
+          <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+          <p className="text-muted-foreground mt-2">Manage users and application preferences</p>
         </div>
         <UsersTable />
       </div>
