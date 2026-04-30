@@ -18,7 +18,6 @@ interface UploadedFile {
 export function FileUpload() {
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [reportName, setReportName] = useState(`Master AP Aging Detail ${new Date().toISOString().split('T')[0]}`);
-  const [email, setEmail] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [processedData, setProcessedData] = useState<TransactionRow[] | null>(() => {
     if (typeof window === "undefined") return null;
@@ -130,35 +129,6 @@ export function FileUpload() {
     }
   };
 
-  const handleEmail = async () => {
-    if (!processedData) return;
-
-    setIsExporting(true);
-
-    try {
-      const response = await fetch("/api/email-report", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          transactions: processedData,
-          reportName,
-          email,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to send email");
-      }
-
-      toast.success("Report sent to " + email);
-    } catch (error) {
-      console.error("Error emailing report:", error);
-      toast.error("Failed to send email. Please try again.");
-    } finally {
-      setIsExporting(false);
-    }
-  };
-
   const handleReset = () => {
     setProcessedData(null);
     setFiles([]);
@@ -184,8 +154,7 @@ export function FileUpload() {
           transactions={processedData}
           onTransactionsChange={setProcessedData}
           onExport={handleExport}
-          onEmail={handleEmail}
-          isExporting={isExporting}
+isExporting={isExporting}
         />
       </div>
     );
@@ -258,18 +227,6 @@ export function FileUpload() {
               onChange={(e) => setReportName(e.target.value)}
               placeholder="Master AP Aging Detail 2026-04-07"
               required
-              disabled={isProcessing}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="your.email@example.com"
               disabled={isProcessing}
             />
           </div>

@@ -4,14 +4,13 @@ import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Download, Mail, Search } from "lucide-react";
+import { Download, Search } from "lucide-react";
 import type { TransactionRow } from "@/lib/types";
 
 interface DataPreviewProps {
   transactions: TransactionRow[];
   onTransactionsChange: (transactions: TransactionRow[]) => void;
   onExport: () => void;
-  onEmail: () => void;
   isExporting: boolean;
 }
 
@@ -35,7 +34,7 @@ function isBlankRow(tx: TransactionRow): boolean {
   );
 }
 
-export function DataPreview({ transactions, onExport, onEmail, isExporting }: DataPreviewProps) {
+export function DataPreview({ transactions, onExport, isExporting }: DataPreviewProps) {
   const [search, setSearch] = useState("");
 
   const dataRows = useMemo(
@@ -107,10 +106,6 @@ export function DataPreview({ transactions, onExport, onEmail, isExporting }: Da
           <Button onClick={onExport} disabled={isExporting}>
             <Download className="mr-2 h-4 w-4" />
             Export to Excel
-          </Button>
-          <Button onClick={onEmail} variant="outline" disabled={isExporting}>
-            <Mail className="mr-2 h-4 w-4" />
-            Email Report
           </Button>
         </div>
       </div>
