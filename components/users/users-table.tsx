@@ -33,7 +33,7 @@ interface AddForm {
 
 function domainError(email: string): string | null {
   const domain = email.split("@")[1]?.toLowerCase();
-  if (!domain) return null;
+  if (!domain || domain.trim() === "") return null;  // no @ yet → skip until complete
   return ALLOWED_DOMAINS.includes(domain)
     ? null
     : `Only ${ALLOWED_DOMAINS.join(" and ")} emails are allowed.`;
@@ -101,15 +101,16 @@ export function UsersTable() {
   };
 
   const handleRemove = async () => {
-    if (!removeTarget) return;
+    const target = removeTarget;   // capture before any async/state updates
+    if (!target) return;
     setIsRemoving(true);
     try {
-      const res = await fetch(`/api/users/${removeTarget.id}`, { method: "DELETE" });
+      const res = await fetch(`/api/users/${target.id}`, { method: "DELETE" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Failed to remove user");
-      toast.success(`${removeTarget.email} removed`);
+      toast.success(`${target.email} removed`);
       setRemoveTarget(null);
-      setUsers((prev) => prev.filter((u) => u.id !== removeTarget.id));
+      setUsers((prev) => prev.filter((u) => u.id !== target.id));
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to remove user");
     } finally {
@@ -211,7 +212,14 @@ export function UsersTable() {
       </Card>
 
       {/* ── Add User Dialog ── */}
-      <Dialog open={isAddOpen} onOpenChange={(open) => { setIsAddOpen(open); if (!open) setAddError(null); }}>
+      <Dialog open={isAddOpen} onOpenChange={(open) => {
+        setIsAddOpen(open);
+        if (!open) {
+          setAddError(null);
+          setEmailDomainError(null);
+          setAddForm({ email: "", full_name: "", password: "", role: "user" });
+        }
+      }}>
         <DialogContent>
           <form onSubmit={handleAdd}>
             <DialogHeader>
