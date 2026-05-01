@@ -1,0 +1,126 @@
+<h2>Where does Settings live?</h2>
+<p class="subtitle">The "Add User" flow needs a home. Three options for how it fits into the navigation.</p>
+
+<div class="cards">
+
+  <!-- Option A: Replace Users with Settings -->
+  <div class="card" data-choice="replace-users" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#f8f8f8;padding:14px;border-radius:8px;">
+      <div style="display:flex;gap:10px;height:170px;">
+        <div style="width:90px;background:#fff;border:1px solid #e5e5e5;border-radius:6px;padding:8px;display:flex;flex-direction:column;gap:4px;">
+          <div style="color:#1a1a1a;font-size:9px;font-weight:700;font-family:Georgia,serif;margin-bottom:6px;">Americana</div>
+          <div style="padding:4px 6px;color:#888;font-size:8px;display:flex;gap:4px;align-items:center;">
+            <span>📄</span> AP Aging
+          </div>
+          <div style="padding:4px 6px;color:#888;font-size:8px;display:flex;gap:4px;align-items:center;">
+            <span>👥</span> Clients
+          </div>
+          <div style="padding:4px 6px;color:#888;font-size:8px;display:flex;gap:4px;align-items:center;">
+            <span>📋</span> History
+          </div>
+          <div style="background:#1a1a1a;border-radius:4px;padding:4px 6px;color:#fff;font-size:8px;display:flex;gap:4px;align-items:center;">
+            <span>⚙️</span> <strong>Settings</strong>
+          </div>
+          <div style="margin-top:auto;font-size:7px;color:#B9965A;border-top:1px solid #eee;padding-top:6px;">☾ Dark mode</div>
+        </div>
+        <div style="flex:1;background:#fff;border:1px solid #e5e5e5;border-radius:6px;padding:10px;overflow:hidden;">
+          <div style="font-size:10px;font-weight:700;color:#1a1a1a;margin-bottom:8px;">Settings</div>
+          <div style="font-size:8px;font-weight:600;color:#B9965A;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">User Management</div>
+          <div style="background:#f9f9f9;border:1px solid #eee;border-radius:4px;padding:6px;margin-bottom:6px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div style="font-size:8px;color:#333;">admin@americana.com <span style="background:#fef3c7;color:#92400e;padding:1px 4px;border-radius:3px;font-size:7px;">admin</span></div>
+              <div style="font-size:7px;color:#888;">•••</div>
+            </div>
+          </div>
+          <div style="background:#f9f9f9;border:1px solid #eee;border-radius:4px;padding:6px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div style="font-size:8px;color:#333;">user@americana.com <span style="background:#f3f4f6;color:#374151;padding:1px 4px;border-radius:3px;font-size:7px;">user</span></div>
+              <div style="font-size:7px;color:#888;">•••</div>
+            </div>
+          </div>
+          <div style="margin-top:8px;background:#1a1a1a;color:#fff;font-size:8px;border-radius:4px;padding:5px 8px;display:inline-block;">+ Add User</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Rename "Users" → "Settings"</h3>
+      <p>The existing Users nav item becomes Settings. User management lives there as a section. Clean — one destination for admin config.</p>
+    </div>
+  </div>
+
+  <!-- Option B: Drawer from sidebar footer -->
+  <div class="card" data-choice="drawer" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#f8f8f8;padding:14px;border-radius:8px;">
+      <div style="display:flex;gap:10px;height:170px;">
+        <div style="width:90px;background:#fff;border:1px solid #e5e5e5;border-radius:6px;padding:8px;display:flex;flex-direction:column;gap:4px;">
+          <div style="color:#1a1a1a;font-size:9px;font-weight:700;font-family:Georgia,serif;margin-bottom:6px;">Americana</div>
+          <div style="padding:4px 6px;color:#888;font-size:8px;">📄 AP Aging</div>
+          <div style="padding:4px 6px;color:#888;font-size:8px;">👥 Clients</div>
+          <div style="padding:4px 6px;color:#888;font-size:8px;">📋 History</div>
+          <div style="padding:4px 6px;color:#888;font-size:8px;">🛡 Users</div>
+          <div style="margin-top:auto;border-top:1px solid #eee;padding-top:6px;display:flex;flex-direction:column;gap:3px;">
+            <div style="font-size:8px;color:#333;font-weight:500;truncate">admin</div>
+            <div style="display:flex;justify-content:space-between;">
+              <div style="font-size:7px;color:#B9965A;">⚙ Settings</div>
+              <div style="font-size:7px;color:#888;">☾</div>
+            </div>
+          </div>
+        </div>
+        <!-- Drawer overlay -->
+        <div style="flex:1;position:relative;overflow:hidden;">
+          <div style="background:#fff;border:1px solid #e5e5e5;border-radius:6px;height:100%;padding:10px;opacity:0.3;">
+            <div style="font-size:8px;color:#aaa;">Main content…</div>
+          </div>
+          <!-- Drawer panel sliding in from right -->
+          <div style="position:absolute;right:0;top:0;bottom:0;width:75%;background:#fff;border:1px solid #e5e5e5;border-radius:6px;padding:10px;box-shadow:-4px 0 12px rgba(0,0,0,0.1);">
+            <div style="font-size:10px;font-weight:700;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;">
+              Settings <span style="color:#aaa;font-size:10px;cursor:pointer;">✕</span>
+            </div>
+            <div style="font-size:7px;font-weight:600;color:#B9965A;text-transform:uppercase;margin-bottom:5px;">Users</div>
+            <div style="background:#f9f9f9;border-radius:3px;padding:5px;margin-bottom:4px;font-size:7px;color:#333;">admin@americana.com</div>
+            <div style="background:#f9f9f9;border-radius:3px;padding:5px;font-size:7px;color:#333;">user@americana.com</div>
+            <div style="margin-top:6px;background:#1a1a1a;color:#fff;font-size:7px;border-radius:3px;padding:4px 7px;display:inline-block;">+ Add User</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Slide-over Drawer from Sidebar Footer</h3>
+      <p>A gear icon next to the user's name opens a settings drawer that slides over the main content. No navigation away from current work.</p>
+    </div>
+  </div>
+
+  <!-- Option C: Keep users page, add tab -->
+  <div class="card" data-choice="tabs" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#f8f8f8;padding:14px;border-radius:8px;">
+      <div style="display:flex;gap:10px;height:170px;">
+        <div style="width:90px;background:#fff;border:1px solid #e5e5e5;border-radius:6px;padding:8px;display:flex;flex-direction:column;gap:4px;">
+          <div style="color:#1a1a1a;font-size:9px;font-weight:700;font-family:Georgia,serif;margin-bottom:6px;">Americana</div>
+          <div style="padding:4px 6px;color:#888;font-size:8px;">📄 AP Aging</div>
+          <div style="padding:4px 6px;color:#888;font-size:8px;">👥 Clients</div>
+          <div style="padding:4px 6px;color:#888;font-size:8px;">📋 History</div>
+          <div style="background:#1a1a1a;border-radius:4px;padding:4px 6px;color:#fff;font-size:8px;">⚙️ Settings</div>
+          <div style="margin-top:auto;font-size:7px;color:#B9965A;border-top:1px solid #eee;padding-top:6px;">☾ Dark mode</div>
+        </div>
+        <div style="flex:1;background:#fff;border:1px solid #e5e5e5;border-radius:6px;padding:10px;overflow:hidden;">
+          <!-- Tabs -->
+          <div style="display:flex;gap:0;margin-bottom:10px;border-bottom:1px solid #eee;">
+            <div style="font-size:8px;padding:4px 8px;border-bottom:2px solid #1a1a1a;color:#1a1a1a;font-weight:600;">Users</div>
+            <div style="font-size:8px;padding:4px 8px;color:#888;">Preferences</div>
+          </div>
+          <div style="font-size:7px;font-weight:600;color:#B9965A;text-transform:uppercase;margin-bottom:5px;">User Management</div>
+          <div style="background:#f9f9f9;border-radius:3px;padding:5px;margin-bottom:4px;font-size:7px;color:#333;">admin@americana.com</div>
+          <div style="background:#f9f9f9;border-radius:3px;padding:5px;font-size:7px;color:#333;">user@americana.com</div>
+          <div style="margin-top:6px;background:#1a1a1a;color:#fff;font-size:7px;border-radius:3px;padding:4px 7px;display:inline-block;">+ Add User</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Settings Page with Tabs</h3>
+      <p>A full Settings page in the sidebar with tabs — "Users" is the first tab, room for future tabs like Preferences or Notifications.</p>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:16px;">Click to select, then confirm in the terminal.</p>

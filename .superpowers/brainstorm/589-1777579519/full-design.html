@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Preview</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #111; color: #eee; padding: 24px; }
+  h2 { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+  .subtitle { font-size: 13px; color: #888; margin-bottom: 24px; }
+
+  .section-label {
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+    color: #B9965A; margin-bottom: 12px; margin-top: 28px;
+  }
+
+  /* ── App Shell ── */
+  .app-shell {
+    display: flex; height: 480px; border-radius: 12px; overflow: hidden;
+    border: 1px solid rgba(185,150,90,0.25); box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 200px; background: #111; border-right: 1px solid rgba(185,150,90,0.15);
+    display: flex; flex-direction: column; flex-shrink: 0;
+  }
+  .sidebar-header {
+    height: 56px; padding: 0 20px; display: flex; align-items: center;
+    border-bottom: 1px solid rgba(185,150,90,0.15);
+  }
+  .sidebar-logo { font-family: Georgia, serif; font-size: 15px; font-weight: 700; color: #fff; }
+  .sidebar-nav { flex: 1; padding: 12px 10px; display: flex; flex-direction: column; gap: 2px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 8px; padding: 7px 10px;
+    border-radius: 6px; font-size: 12px; color: rgba(255,255,255,0.45); cursor: pointer;
+  }
+  .nav-item.active { background: rgba(185,150,90,0.15); color: #B9965A; }
+  .nav-item:not(.active):hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.7); }
+  .nav-icon { width: 14px; height: 14px; opacity: 0.7; }
+  .sidebar-footer {
+    padding: 12px 14px; border-top: 1px solid rgba(185,150,90,0.15);
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .user-info { padding: 0 2px; }
+  .user-name { font-size: 12px; font-weight: 500; color: #fff; }
+  .user-email { font-size: 10px; color: rgba(255,255,255,0.35); margin-top: 1px; }
+  .user-badge { font-size: 10px; color: #B9965A; font-weight: 500; margin-top: 2px; }
+  .footer-actions { display: flex; gap: 6px; }
+  .footer-btn {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px;
+    padding: 6px 8px; border-radius: 6px; font-size: 11px; cursor: pointer;
+    color: rgba(255,255,255,0.4); background: none; border: none;
+  }
+  .footer-btn:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.7); }
+  .toggle-wrap {
+    display: flex; align-items: center; gap: 6px; padding: 6px 8px;
+    border-radius: 6px; cursor: pointer;
+  }
+  .toggle-wrap:hover { background: rgba(255,255,255,0.06); }
+  .toggle-track {
+    width: 28px; height: 16px; background: #B9965A; border-radius: 8px;
+    position: relative; transition: background 0.2s; flex-shrink: 0;
+  }
+  .toggle-thumb {
+    width: 12px; height: 12px; background: #fff; border-radius: 50%;
+    position: absolute; top: 2px; right: 2px; transition: right 0.2s;
+  }
+  .toggle-label { font-size: 11px; color: rgba(255,255,255,0.5); }
+
+  /* ── Main content ── */
+  .main { flex: 1; background: #0d0d0d; overflow-y: auto; padding: 28px; }
+  .page-header { margin-bottom: 20px; }
+  .page-title { font-size: 20px; font-weight: 700; color: #fff; }
+  .page-desc { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 4px; }
+
+  /* ── Card ── */
+  .card {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(185,150,90,0.15);
+    border-radius: 10px; overflow: hidden;
+  }
+  .card-header {
+    padding: 16px 20px; border-bottom: 1px solid rgba(185,150,90,0.1);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .card-title { font-size: 14px; font-weight: 600; color: #fff; }
+  .card-desc { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 2px; }
+
+  /* ── Add User Button ── */
+  .btn-gold {
+    display: flex; align-items: center; gap: 6px;
+    background: #B9965A; color: #fff; border: none; border-radius: 6px;
+    padding: 7px 14px; font-size: 12px; font-weight: 600; cursor: pointer;
+  }
+  .btn-gold:hover { background: #c9a66a; }
+
+  /* ── Table ── */
+  .table { width: 100%; border-collapse: collapse; }
+  .table th {
+    text-align: left; font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.06em; color: rgba(255,255,255,0.3); padding: 10px 16px;
+    border-bottom: 1px solid rgba(185,150,90,0.1);
+  }
+  .table td {
+    padding: 12px 16px; font-size: 12px; color: rgba(255,255,255,0.75);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .table tr:last-child td { border-bottom: none; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px;
+    border-radius: 20px; font-size: 10px; font-weight: 600;
+  }
+  .badge-admin { background: rgba(185,150,90,0.15); color: #B9965A; }
+  .badge-user { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.5); }
+  .badge-active { color: #4ade80; font-size: 11px; }
+  .badge-inactive { color: rgba(255,255,255,0.3); font-size: 11px; }
+  .action-btn {
+    padding: 4px 10px; border-radius: 5px; font-size: 11px; cursor: pointer;
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.5);
+  }
+  .action-btn:hover { background: rgba(255,255,255,0.1); }
+
+  /* ── Dialog Overlay ── */
+  .dialog-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+    display: flex; align-items: center; justify-content: center; z-index: 50;
+    backdrop-filter: blur(4px);
+  }
+  .dialog {
+    background: #161616; border: 1px solid rgba(185,150,90,0.25);
+    border-radius: 14px; padding: 28px; width: 400px;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+  }
+  .dialog-header { margin-bottom: 20px; }
+  .dialog-title { font-size: 16px; font-weight: 700; color: #fff; }
+  .dialog-desc { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 4px; }
+  .field-group { display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px; }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.6); }
+  .field input {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 7px; color: #fff; font-size: 13px; padding: 9px 12px;
+    outline: none;
+  }
+  .field input:focus { border-color: rgba(185,150,90,0.5); }
+  .role-select {
+    display: flex; gap: 8px;
+  }
+  .role-opt {
+    flex: 1; padding: 8px; border-radius: 7px; border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.03); cursor: pointer; text-align: center;
+  }
+  .role-opt.selected { border-color: #B9965A; background: rgba(185,150,90,0.1); }
+  .role-opt-title { font-size: 12px; font-weight: 600; color: #fff; }
+  .role-opt-desc { font-size: 10px; color: rgba(255,255,255,0.35); margin-top: 2px; }
+  .role-opt.selected .role-opt-title { color: #B9965A; }
+  .dialog-footer { display: flex; justify-content: flex-end; gap: 8px; }
+  .btn-ghost {
+    padding: 8px 16px; border-radius: 7px; font-size: 13px; cursor: pointer;
+    background: none; border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.5);
+  }
+  .btn-ghost:hover { border-color: rgba(255,255,255,0.2); color: rgba(255,255,255,0.8); }
+  .btn-primary {
+    padding: 8px 20px; border-radius: 7px; font-size: 13px; font-weight: 600;
+    cursor: pointer; background: #B9965A; color: #fff; border: none;
+  }
+
+  /* ── Tabs / Views ── */
+  .tabs { display: flex; gap: 4px; margin-bottom: 0; }
+  .tab { cursor: pointer; }
+
+  /* ── Annotations ── */
+  .annotations { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+  .annotation {
+    display: flex; gap: 10px; align-items: flex-start;
+    background: rgba(185,150,90,0.06); border: 1px solid rgba(185,150,90,0.15);
+    border-radius: 8px; padding: 10px 14px;
+  }
+  .ann-num {
+    width: 20px; height: 20px; border-radius: 50%; background: #B9965A;
+    color: #fff; font-size: 11px; font-weight: 700; display: flex;
+    align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
+  }
+  .ann-text { font-size: 12px; color: rgba(255,255,255,0.65); line-height: 1.5; }
+  .ann-text strong { color: #fff; }
+</style>
+</head>
+<body>
+<h2>Full Design Preview</h2>
+<p class="subtitle">Dark theme app with Settings page + Add User dialog. Review both screens below.</p>
+
+<!-- ───── SCREEN 1: Settings Page ───── -->
+<div class="section-label">Screen 1 — Settings Page (dark theme active)</div>
+<div class="app-shell">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <span class="sidebar-logo">Americana</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M2 3h12v2H2zm0 4h12v2H2zm0 4h8v2H2z"/></svg>
+        AP Aging
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 8a3 3 0 100-6 3 3 0 000 6zm-5 6a5 5 0 0110 0H3z"/></svg>
+        Clients
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h12v2H2zm0 4h12v2H2zm0 4h8v2H2z"/></svg>
+        History
+      </div>
+      <div class="nav-item active">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zM6.5 5.5a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zm-1 6a3.5 3.5 0 017 0H5.5z"/></svg>
+        Settings
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-name">Alex Rivera</div>
+        <div class="user-email">alex@americana.com</div>
+        <div class="user-badge">Admin</div>
+      </div>
+      <!-- Dark mode toggle (ON) -->
+      <div class="toggle-wrap">
+        <div class="toggle-track"><div class="toggle-thumb"></div></div>
+        <span class="toggle-label">Dark mode</span>
+      </div>
+      <div class="footer-btn">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M2 12h12v2H2zm2-4h8v2H4zm2-4h4v2H6z"/></svg>
+        Sign out
+      </div>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="page-header">
+      <div class="page-title">Settings</div>
+      <div class="page-desc">Manage users and application preferences</div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">User Management</div>
+          <div class="card-desc">Add and manage who has access to this dashboard</div>
+        </div>
+        <button class="btn-gold">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2"/></svg>
+          Add User
+        </button>
+      </div>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Name</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th style="text-align:right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>alex@americanapartners.com</td>
+            <td style="color:rgba(255,255,255,0.4)">Alex Rivera</td>
+            <td><span class="badge badge-admin">⬡ admin</span></td>
+            <td><span class="badge-active">● Active</span></td>
+            <td style="text-align:right"><button class="action-btn">Make User</button></td>
+          </tr>
+          <tr>
+            <td>jordan@americanapartners.com</td>
+            <td style="color:rgba(255,255,255,0.4)">Jordan Kim</td>
+            <td><span class="badge badge-user">○ user</span></td>
+            <td><span class="badge-active">● Active</span></td>
+            <td style="text-align:right">
+              <div style="display:flex;gap:6px;justify-content:flex-end;">
+                <button class="action-btn">Make Admin</button>
+                <button class="action-btn">Deactivate</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>sam@nonzeroai.com</td>
+            <td style="color:rgba(255,255,255,0.4)">Sam Chen</td>
+            <td><span class="badge badge-user">○ user</span></td>
+            <td><span class="badge-inactive">● Inactive</span></td>
+            <td style="text-align:right"><button class="action-btn">Activate</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ───── SCREEN 2: Add User Dialog ───── -->
+<div class="section-label" style="margin-top:32px;">Screen 2 — Add User Dialog</div>
+<div style="position:relative;height:480px;border-radius:12px;overflow:hidden;border:1px solid rgba(185,150,90,0.25);">
+  <!-- Dimmed app behind -->
+  <div class="app-shell" style="height:100%;filter:brightness(0.35);border:none;border-radius:0;">
+    <div class="sidebar" style="width:200px;"></div>
+    <div class="main"></div>
+  </div>
+  <!-- Dialog on top -->
+  <div class="dialog-overlay" style="position:absolute;">
+    <div class="dialog">
+      <div class="dialog-header">
+        <div class="dialog-title">Add User</div>
+        <div class="dialog-desc">Create credentials to share in person or via secure email.</div>
+      </div>
+      <div class="field-group">
+        <div class="field">
+          <label>Email</label>
+          <input type="email" value="newuser@americanapartners.com" readonly />
+        </div>
+        <div class="field">
+          <label>Full Name <span style="color:rgba(255,255,255,0.25);font-weight:400">(optional)</span></label>
+          <input type="text" placeholder="e.g. Morgan Lee" readonly />
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input type="password" value="••••••••••••" readonly />
+        </div>
+        <div class="field">
+          <label>Role</label>
+          <div class="role-select">
+            <div class="role-opt">
+              <div class="role-opt-title">User</div>
+              <div class="role-opt-desc">Upload & view reports</div>
+            </div>
+            <div class="role-opt selected">
+              <div class="role-opt-title">Admin</div>
+              <div class="role-opt-desc">Full access + settings</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="dialog-footer">
+        <button class="btn-ghost">Cancel</button>
+        <button class="btn-primary">Create User</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Annotations -->
+<div class="annotations">
+  <div class="annotation">
+    <div class="ann-num">1</div>
+    <div class="ann-text"><strong>Dark theme toggle</strong> in the sidebar footer — a pill toggle that persists per browser (localStorage). When on, applies the existing <code>.dark</code> class with black + gold colors tuned to match the login screen.</div>
+  </div>
+  <div class="annotation">
+    <div class="ann-num">2</div>
+    <div class="ann-text"><strong>"Users" nav item renamed "Settings"</strong> — same admin-only visibility. Page title becomes "Settings", user table under a "User Management" subheading.</div>
+  </div>
+  <div class="annotation">
+    <div class="ann-num">3</div>
+    <div class="ann-text"><strong>"Invite User" button replaced with "Add User"</strong> — dialog collects email, optional full name, password, and role. Calls Supabase Admin API (<code>createUser</code>) directly — no invite email sent.</div>
+  </div>
+  <div class="annotation">
+    <div class="ann-num">4</div>
+    <div class="ann-text"><strong>Domain restriction enforced</strong> — same as login, only <code>@americanapartners.com</code> and <code>@nonzeroai.com</code> emails accepted. Inline validation before submit.</div>
+  </div>
+</div>
+
+<p style="font-size:13px;color:#888;margin-top:20px;">Does this look right? Any changes before I write the spec?</p>
+</body>
+</html>

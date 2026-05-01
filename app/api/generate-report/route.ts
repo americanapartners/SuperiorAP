@@ -46,10 +46,10 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const adminClient = createSupabaseAdminClient();
+
   try {
     const excelBuffer = await generateMasterReport(transactions, reportName);
-
-    const adminClient = createSupabaseAdminClient();
     const storagePath = `${user.id}/${reportId}.xlsx`;
     const { error: uploadError } = await adminClient.storage
       .from("reports")
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
       });
     if (uploadError) throw uploadError;
 
-    await supabase
+    await adminClient
       .from("reports")
       .update({ status: "completed", file_url: storagePath })
       .eq("id", reportId);
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error generating report:", error);
-    await supabase.from("reports").update({ status: "failed" }).eq("id", reportId);
+    await adminClient.from("reports").update({ status: "failed" }).eq("id", reportId);
     return NextResponse.json({ error: "Failed to generate report" }, { status: 500 });
   }
 }
